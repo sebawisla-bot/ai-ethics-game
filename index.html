@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="copyright" content="© 2025 Sebastian Wisła">
+    <meta name="license" content="CC BY-NC 4.0">
+    <meta name="robots" content="noai, noimageai">
+    <title>Matching Game - AI Ethics Issues</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(45deg, #2196F3, #21CBF3);
+            color: white;
+            text-align: center;
+            padding: 30px 20px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .game-area {
+            display: flex;
+            gap: 30px;
+            padding: 30px;
+            min-height: 600px;
+        }
+
+        .definitions, .explanations {
+            flex: 1;
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+        }
+
+        .definitions h2, .explanations h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #2c3e50;
+            font-size: 1.3rem;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #3498db;
+        }
+
+        .item {
+            background: white;
+            margin: 10px 0;
+            padding: 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+
+        .item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+            border-color: #3498db;
+        }
+
+        .item.selected {
+            background: linear-gradient(45deg, #3498db, #2980b9);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(52, 152, 219, 0.3);
+        }
+
+        .item.matched {
+            background: linear-gradient(45deg, #27ae60, #2ecc71);
+            color: white;
+            border-color: #27ae60;
+            cursor: default;
+        }
+
+        .item.wrong {
+            background: linear-gradient(45deg, #e74c3c, #c0392b);
+            color: white;
+            animation: shake 0.5s;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        .number {
+            font-weight: bold;
+            color: #2c3e50;
+            margin-right: 8px;
+            font-size: 1.1rem;
+        }
+
+        .item.selected .number,
+        .item.matched .number,
+        .item.wrong .number {
+            color: white;
+        }
+
+        .controls {
+            text-align: center;
+            padding: 20px 30px;
+            background: #ecf0f1;
+            border-top: 1px solid #bdc3c7;
+        }
+
+        .btn {
+            background: linear-gradient(45deg, #3498db, #2980b9);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1rem;
+            margin: 0 10px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(52, 152, 219, 0.4);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .score {
+            background: white;
+            margin: 20px 30px;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+        }
+
+        .score-item {
+            display: inline-block;
+            margin: 0 20px;
+            padding: 10px 20px;
+            background: linear-gradient(45deg, #f39c12, #e67e22);
+            color: white;
+            border-radius: 20px;
+            font-weight: bold;
+        }
+
+        .answer-key {
+            background: white;
+            margin: 20px 30px;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            display: none;
+        }
+
+        .answer-key h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .answer-pair {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 15px;
+            margin: 5px 0;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #27ae60;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 30px;
+            border-radius: 20px;
+            max-width: 600px;
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.3);
+            animation: slideDown 0.4s ease;
+            position: relative;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideDown {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            line-height: 20px;
+        }
+
+        .close:hover {
+            color: #000;
+        }
+
+        .modal-content h2 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #3498db;
+        }
+
+        .modal-content p {
+            line-height: 1.8;
+            color: #555;
+            margin-bottom: 15px;
+        }
+
+        .modal-content strong {
+            color: #2c3e50;
+        }
+
+        .modal-content a {
+            color: #3498db;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .modal-content a:hover {
+            text-decoration: underline;
+        }
+
+        .linkedin-link {
+            display: inline-block;
+            margin-top: 15px;
+            padding: 10px 20px;
+            background: #0077b5;
+            color: white !important;
+            border-radius: 8px;
+            text-decoration: none !important;
+            transition: all 0.3s ease;
+        }
+
+        .linkedin-link:hover {
+            background: #005885;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 119, 181, 0.3);
+        }
+
+        footer {
+            text-align: center;
+            font-size: 0.85em;
+            color: #666;
+            padding: 30px 20px;
+            background: #f8f9fa;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        footer a {
+            color: #3498db;
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            .game-area {
+                flex-direction: column;
+                gap: 20px;
+            }
+            
+            .header h1 {
+                font-size: 1.8rem;
+            }
+            
+            .item {
+                padding: 12px;
+                font-size: 0.9rem;
+            }
+
+            .modal-content {
+                margin: 10% auto;
+                padding: 20px;
+                max-width: 90%;
+            }
+
+            .btn {
+                margin: 5px;
+                padding: 10px 20px;
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+			<div style="text-align: right; padding: 10px;">
+				<a href="pl.html" style="text-decoration: none; font-size: 24px; color: white;">pl</a> <span style="color: white;">|</span> 
+				<a href="index.html" style="text-decoration: none; font-size: 24px; color: white;">en</a> <span style="color: white;">|</span> 
+				<a href="fr.html" style="text-decoration: none; font-size: 24px; color: white;">fr</a>
+			</div>
+            <h1>🤖 AI Ethics Issues</h1>
+            <p>Match the definitions with their corresponding explanations</p>
+        </div>
+
+        <div class="score">
+            <div class="score-item">
+                Matched: <span id="matched">0</span>/9
+            </div>
+            <div class="score-item">
+                Attempts: <span id="attempts">0</span>
+            </div>
+            <div class="score-item">
+                Points: <span id="points">0</span>
+            </div>
+        </div>
+
+        <div class="game-area">
+            <div class="definitions">
+                <h2>🧩 Definitions</h2>
+                <div class="item" data-id="1"><span class="number">1.</span> Lack of explainability in AI decisions</div>
+                <div class="item" data-id="2"><span class="number">2.</span> Loss of human autonomy</div>
+                <div class="item" data-id="3"><span class="number">3.</span> Lack of algorithm transparency (black box)</div>
+                <div class="item" data-id="4"><span class="number">4.</span> Accountability gap</div>
+                <div class="item" data-id="5"><span class="number">5.</span> AI hallucinations</div>
+                <div class="item" data-id="6"><span class="number">6.</span> Data processing without consent</div>
+                <div class="item" data-id="7"><span class="number">7.</span> Algorithmic bias</div>
+                <div class="item" data-id="8"><span class="number">8.</span> Deepening social inequalities</div>
+                <div class="item" data-id="9"><span class="number">9.</span> Vendor lock-in</div>
+            </div>
+
+            <div class="explanations">
+                <h2>💡 Explanations</h2>
+                <div class="item" data-id="A"><span class="number">A.</span> The way AI operates is opaque, making it impossible to understand how decisions are made.</div>
+                <div class="item" data-id="B"><span class="number">B.</span> AI creates content that appears true but is actually incorrect or fabricated.</div>
+                <div class="item" data-id="C"><span class="number">C.</span> Excessive trust in AI recommendations limits human independence and critical thinking.</div>
+                <div class="item" data-id="D"><span class="number">D.</span> Algorithms can reinforce existing social biases, leading to discrimination in areas like hiring or credit approval.</div>
+                <div class="item" data-id="E"><span class="number">E.</span> AI may process personal data without informed user consent, violating privacy principles.</div>
+                <div class="item" data-id="F"><span class="number">F.</span> Individuals and communities without access to AI may be excluded from its benefits, deepening inequalities.</div>
+                <div class="item" data-id="G"><span class="number">G.</span> It's unclear who is responsible for AI decisions: the creator, user, or organization.</div>
+                <div class="item" data-id="H"><span class="number">H.</span> Using a single technology ecosystem can limit an organization's independence and competitiveness.</div>
+                <div class="item" data-id="I"><span class="number">I.</span> AI makes decisions that cannot be easily explained, making them difficult to control and accept.</div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <button class="btn" onclick="resetGame()">🔄 Start Over</button>
+            <button class="btn" onclick="showAnswers()">📖 Show Answers</button>
+            <button class="btn" onclick="showAuthorInfo()">👤 About Author</button>
+        </div>
+
+        <div class="answer-key" id="answerKey">
+            <h3>🔑 Answer Key</h3>
+            <div class="answer-pair"><span><strong>1. Lack of explainability in AI decisions</strong></span><span><strong>I.</strong> AI makes decisions that cannot be easily explained, making them difficult to control and accept.</span></div>
+            <div class="answer-pair"><span><strong>2. Loss of human autonomy</strong></span><span><strong>C.</strong> Excessive trust in AI recommendations limits human independence and critical thinking.</span></div>
+            <div class="answer-pair"><span><strong>3. Lack of algorithm transparency</strong></span><span><strong>A.</strong> The way AI operates is opaque, making it impossible to understand how decisions are made.</span></div>
+            <div class="answer-pair"><span><strong>4. Accountability gap</strong></span><span><strong>G.</strong> It's unclear who is responsible for AI decisions: the creator, user, or organization.</span></div>
+            <div class="answer-pair"><span><strong>5. AI hallucinations</strong></span><span><strong>B.</strong> AI creates content that appears true but is actually incorrect or fabricated.</span></div>
+            <div class="answer-pair"><span><strong>6. Data processing without consent</strong></span><span><strong>E.</strong> AI may process personal data without informed user consent, violating privacy principles.</span></div>
+            <div class="answer-pair"><span><strong>7. Algorithmic bias</strong></span><span><strong>D.</strong> Algorithms can reinforce existing social biases, leading to discrimination in areas like hiring...</span></div>
+            <div class="answer-pair"><span><strong>8. Deepening social inequalities</strong></span><span><strong>F.</strong> Individuals and communities without access to AI may be excluded from its benefits, deepening inequalities.</span></div>
+            <div class="answer-pair"><span><strong>9. Vendor lock-in</strong></span><span><strong>H.</strong> Using a single technology ecosystem can limit an organization's independence and competitiveness.</span></div>
+        </div>
+
+        <!-- Modal About Author -->
+        <div id="authorModal" class="modal">
+            <div class="modal-content">
+                <span class="close" onclick="closeAuthorModal()">&times;</span>
+                <h2>👤 About Author</h2>
+                <p><strong>Sebastian Wisła</strong></p>
+                <p>This material is available under the <a href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank">Creative Commons Attribution-NonCommercial 4.0 International License (CC BY-NC 4.0)</a>.</p>
+                <p><strong>Concept and development:</strong> Sebastian Wisła<br>
+                <strong>AI Support:</strong> Claude Sonnet 4.5</p>
+                <a href="https://www.linkedin.com/in/erpandcrm/" target="_blank" class="linkedin-link">
+                    🔗 LinkedIn Profile
+                </a>
+            </div>
+        </div>
+
+        <footer>
+            © 2025 Sebastian Wisła. This material is available under the 
+            <a href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank">Creative Commons Attribution-NonCommercial 4.0 International License (CC BY-NC 4.0)</a>.<br>
+            Concept and development: <strong>Sebastian Wisła</strong> | AI Support: Claude Sonnet 4.5
+        </footer>
+    </div>
+
+    <script>
+        // Correct answers
+        const correctAnswers = {
+            '1': 'I',
+            '2': 'C', 
+            '3': 'A',
+            '4': 'G',
+            '5': 'B',
+            '6': 'E',
+            '7': 'D',
+            '8': 'F',
+            '9': 'H'
+        };
+
+        let selectedDefinition = null;
+        let selectedExplanation = null;
+        let matched = 0;
+        let attempts = 0;
+        let points = 100;
+
+        // Game initialization
+        document.addEventListener('DOMContentLoaded', function() {
+            addEventListeners();
+            updateScore();
+        });
+
+        function addEventListeners() {
+            // Definitions
+            document.querySelectorAll('.definitions .item').forEach(item => {
+                item.addEventListener('click', function() {
+                    if (this.classList.contains('matched')) return;
+                    
+                    // Remove previous selection from definitions
+                    document.querySelectorAll('.definitions .item').forEach(el => 
+                        el.classList.remove('selected'));
+                    
+                    this.classList.add('selected');
+                    selectedDefinition = this.dataset.id;
+                    
+                    checkForMatch();
+                });
+            });
+
+            // Explanations
+            document.querySelectorAll('.explanations .item').forEach(item => {
+                item.addEventListener('click', function() {
+                    if (this.classList.contains('matched')) return;
+                    
+                    // Remove previous selection from explanations
+                    document.querySelectorAll('.explanations .item').forEach(el => 
+                        el.classList.remove('selected'));
+                    
+                    this.classList.add('selected');
+                    selectedExplanation = this.dataset.id;
+                    
+                    checkForMatch();
+                });
+            });
+        }
+
+        function checkForMatch() {
+            if (selectedDefinition && selectedExplanation) {
+                attempts++;
+                
+                if (correctAnswers[selectedDefinition] === selectedExplanation) {
+                    // Correct match
+                    const defItem = document.querySelector(`.definitions .item[data-id="${selectedDefinition}"]`);
+                    const expItem = document.querySelector(`.explanations .item[data-id="${selectedExplanation}"]`);
+                    
+                    defItem.classList.remove('selected');
+                    expItem.classList.remove('selected');
+                    defItem.classList.add('matched');
+                    expItem.classList.add('matched');
+                    
+                    matched++;
+                    points += 10;
+                    
+                    // Check if game is completed
+                    if (matched === 9) {
+                        setTimeout(() => {
+                            alert(`🎉 Congratulations! You've completed the game!\n\nResults:\n✅Matched: ${matched}/9\n🎯Attempts: ${attempts}\n⭐Points: ${points}`);
+                        }, 500);
+                    }
+                } else {
+                    // Incorrect match
+                    const defItem = document.querySelector(`.definitions .item[data-id="${selectedDefinition}"]`);
+                    const expItem = document.querySelector(`.explanations .item[data-id="${selectedExplanation}"]`);
+                    
+                    defItem.classList.add('wrong');
+                    expItem.classList.add('wrong');
+                    points = Math.max(0, points - 5);
+                    
+                    setTimeout(() => {
+                        defItem.classList.remove('selected', 'wrong');
+                        expItem.classList.remove('selected', 'wrong');
+                    }, 1000);
+                }
+                
+                selectedDefinition = null;
+                selectedExplanation = null;
+                updateScore();
+            }
+        }
+
+        function updateScore() {
+            document.getElementById('matched').textContent = matched;
+            document.getElementById('attempts').textContent = attempts;
+            document.getElementById('points').textContent = points;
+        }
+
+        function resetGame() {
+            // Reset variables
+            selectedDefinition = null;
+            selectedExplanation = null;
+            matched = 0;
+            attempts = 0;
+            points = 100;
+            
+            // Reset CSS classes
+            document.querySelectorAll('.item').forEach(item => {
+                item.classList.remove('selected', 'matched', 'wrong');
+            });
+            
+            // Hide answers
+            document.getElementById('answerKey').style.display = 'none';
+            
+            updateScore();
+        }
+
+        function showAnswers() {
+            const answerKey = document.getElementById('answerKey');
+            answerKey.style.display = answerKey.style.display === 'none' ? 'block' : 'none';
+        }
+
+        function showAuthorInfo() {
+            document.getElementById('authorModal').style.display = 'block';
+        }
+
+        function closeAuthorModal() {
+            document.getElementById('authorModal').style.display = 'none';
+        }
+
+        // Close modal when clicking outside of it
+        window.onclick = function(event) {
+            const modal = document.getElementById('authorModal');
+            if (event.target == modal) {
+                modal.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>
