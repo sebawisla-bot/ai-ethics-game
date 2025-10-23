@@ -34,7 +34,7 @@ A matching game where participants connect definitions of AI ethics issues with 
 1. Fork this repository
 2. Enable GitHub Pages in Settings → Pages
 3. Select branch: `main` and folder: `/ (root)`
-4. Your game will be available at: `https://your-username.github.io/ai-ethics-game/`
+4. Your game will be available at: `(https://sebawisla-bot.github.io/ai-ethics-game/)`
 
 
 
