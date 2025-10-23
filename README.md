@@ -2,6 +2,8 @@
 
 An interactive educational game for learning about artificial intelligence ethics issues.
 
+https://sebawisla-bot.github.io/ai-ethics-game/index.html
+
 ## 📋 Description
 
 A matching game where participants connect definitions of AI ethics issues with their explanations. Perfect for training sessions, workshops, and education in responsible AI.
